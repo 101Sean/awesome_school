@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>어썸스쿨</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .program-card.active {
+            border-color: #2563eb;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.18);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- Nav -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2.5">
+                <img src="https://awesomeschool-portal.s3.amazonaws.com/portal/static/awesomeschool/images/logo.png" 
+                    alt="어썸스쿨 로고" 
+                    class="h-7 w-auto object-contain">
+            </a>
+            <nav class="flex items-center gap-4 sm:gap-6 text-sm font-medium text-slate-600">
+                <a href="#programs" class="hover:text-blue-600 transition">교육 과정</a>
+                <a href="#curriculum" class="hover:text-blue-600 transition">커리큘럼</a>
+                <a href="#apply" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shadow-sm">
+                    교육 신청하기
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Banner -->
+    <section class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white py-16 sm:py-24">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+            <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-5">
+                스스로 문제를 발견하고 해결하는<br class="hidden sm:inline">
+                <span class="text-blue-400">히어로스쿨 실전 프로젝트 교육</span>
+            </h1>
+            <p class="max-w-2xl mx-auto text-slate-300 text-base sm:text-lg leading-relaxed mb-8">
+                AI 리터러시부터 데이터 분석, 바이브코딩 웹서비스 제작까지<br>
+                학생들이 직접 기획하고 결과물을 완성하는 참여형 커리큘럼을 만나보세요
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-3">
+                <a href="#programs" class="px-6 py-3.5 rounded-xl bg-white text-slate-900 font-bold hover:bg-slate-100 transition">
+                    프로그램 살펴보기
+                </a>
+                <a href="#apply" class="px-6 py-3.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition">
+                    지금 바로 신청하기
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 교육과정 선택 영역 -->
+    <section id="programs" class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+        <div class="text-center mb-12">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">대표 교육 프로그램</h2>
+            <p class="text-slate-500 mt-2">관심 있는 과정을 클릭하면 상세 커리큘럼을 확인할 수 있습니다.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="program-cards">
+            {% for program in programs %}
+            <article
+                class="program-card cursor-pointer bg-white rounded-2xl border-2 border-slate-200 overflow-hidden transition-all duration-200 flex flex-col {% if forloop.first %}active{% endif %}"
+                data-program-id="{{ program.id }}"
+                onclick="selectProgram({{ program.id }})"
+            >
+                <div class="h-44 bg-slate-200 overflow-hidden relative">
+                    {% if program.thumbnail_url %}
+                    <img src="{{ program.thumbnail_url }}" alt="{{ program.title }}" class="w-full h-full object-cover">
+                    {% endif %}
+                    <span class="absolute top-3 left-3 px-2.5 py-1 rounded-md text-xs font-bold bg-slate-900/80 text-white">
+                        1회 · 6차시 표준
+                    </span>
+                </div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">{{ program.title }}</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed flex-1">{{ program.subtitle }}</p>
+                    <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-semibold text-blue-600">
+                        <span>커리큘럼 보기</span>
+                        <span>&darr;</span>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- 과정 상세, 커리큘럼 -->
+    <section id="curriculum" class="bg-white border-y border-slate-200 py-16">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <div class="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-slate-200 mb-10">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Selected Program</span>
+                        <h3 id="detail-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1"></h3>
+                    </div>
+                    <a href="#apply" class="inline-flex justify-center items-center px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition shrink-0">
+                        이 과정으로 신청하기
+                    </a>
+                </div>
+                <p id="detail-description" class="text-slate-600 leading-relaxed"></p>
+            </div>
+
+            <h4 class="text-lg font-bold text-slate-900 mb-6">차시별 상세 커리큘럼</h4>
+            <div id="curriculum-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 교육 신청 폼 -->
+    <section id="apply" class="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-10">
+            <div class="mb-8">
+                <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Application Form</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">교육 신청서 작성</h2>
+                <p class="text-slate-500 text-sm mt-2">
+                    희망 과정과 연락 가능 날짜를 남겨주시면 담당 매니저가 순차적으로 안내해 드립니다.
+                </p>
+            </div>
+
+            <!-- 알림 메시지 박스 -->
+            <div id="form-alert" class="hidden mb-6 p-4 rounded-xl text-sm font-medium"></div>
+
+            <form id="application-form" class="space-y-5">
+                {% csrf_token %}
+
+                <div>
+                    <label for="program" class="block text-sm font-semibold text-slate-700 mb-1.5">희망 교육 과정 *</label>
+                    <select id="program" name="program" required
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        {% for program in programs %}
+                        <option value="{{ program.id }}">{{ program.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label for="applicant_name" class="block text-sm font-semibold text-slate-700 mb-1.5">신청자 이름 (또는 담당자명) *</label>
+                        <input type="text" id="applicant_name" name="applicant_name" required placeholder="홍길동"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-slate-700 mb-1.5">이메일 주소 *</label>
+                        <input type="email" id="email" name="email" required placeholder="teacher@school.kr"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="address" class="block text-sm font-semibold text-slate-700 mb-1.5">기관 / 학교 주소 *</label>
+                    <input type="text" id="address" name="address" required placeholder="서울특별시 영등포구 선유서로25길 28"
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="available_date" class="block text-sm font-semibold text-slate-700 mb-1.5">연락 가능 날짜 *</label>
+                    <input type="date" id="available_date" name="available_date" required
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-slate-400 mt-1">오늘 이후 날짜만 선택할 수 있으며, 해당 날짜에 안내 메일이 자동 발송됩니다.</p>
+                </div>
+
+                <button type="submit" id="submit-btn"
+                    class="w-full py-4 rounded-xl bg-blue-600 text-white font-bold text-base hover:bg-blue-700 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                    교육 신청 접수하기
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-10 text-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <p class="font-bold text-white">주식회사 어썸스쿨 (Awesome School)</p>
+                <p class="text-xs mt-1">서울특별시 영등포구 선유서로25길 28, 영등포 디스테이트</p>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+                <a href="/admin/" class="hover:text-white transition">관리자 페이지</a>
+                <span>&copy; 2026 Awesome School</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 서버에서 내려준 교육 과정 목록 파싱 (API fallback 포함)
+        let programsMap = {};
+
+        async function initPrograms() {
+            try {
+                const res = await fetch('/api/programs/');
+                const data = await res.json();
+                data.forEach(item => { programsMap[item.id] = item; });
+                if (data.length > 0) {
+                    selectProgram(data[0].id);
+                }
+            } catch (err) {
+                console.error('교육 과정 로딩 실패:', err);
+            }
+        }
+
+        // 교육 과정 선택 시 상세 소개 + 커리큘럼 + 신청 폼 동기화
+        function selectProgram(programId) {
+            const program = programsMap[programId];
+            if (!program) return;
+
+            // 카드 활성 스타일 갱신
+            document.querySelectorAll('.program-card').forEach(card => {
+                card.classList.toggle('active', Number(card.dataset.programId) === Number(programId));
+            });
+
+            // 상세 영역 텍스트 갱신
+            document.getElementById('detail-title').textContent = program.title;
+            document.getElementById('detail-description').textContent = program.description;
+
+            // 커리큘럼 카드 렌더링
+            const listEl = document.getElementById('curriculum-list');
+            listEl.innerHTML = (program.curriculum || []).map(item => `
+                <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white transition">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-100 text-blue-700">${item.step}</span>
+                        <h5 class="font-bold text-slate-900">${item.title}</h5>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed">${item.content}</p>
+                </div>
+            `).join('');
+
+            // 신청 폼 셀렉트 박스 자동 동기화
+            const selectEl = document.getElementById('program');
+            if (selectEl) selectEl.value = programId;
+        }
+
+        // 오늘 이전 날짜 선택 방지
+        const dateInput = document.getElementById('available_date');
+        const todayStr = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', todayStr);
+
+        // CSRF 토큰 추출 헬퍼
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return '';
+        }
+
+        // 비동기(Ajax) 교육 신청 제출
+        const form = document.getElementById('application-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const alertBox = document.getElementById('form-alert');
+
+        function showAlert(message, isSuccess) {
+            alertBox.className = isSuccess
+                ? 'mb-6 p-4 rounded-xl text-sm font-medium bg-emerald-50 text-emerald-800 border border-emerald-200'
+                : 'mb-6 p-4 rounded-xl text-sm font-medium bg-rose-50 text-rose-800 border border-rose-200';
+            alertBox.innerHTML = message;
+            alertBox.classList.remove('hidden');
+            alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = '접수 처리 중...';
+            alertBox.classList.add('hidden');
+
+            const payload = {
+                program: Number(document.getElementById('program').value),
+                applicant_name: document.getElementById('applicant_name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                available_date: document.getElementById('available_date').value,
+            };
+
+            try {
+                const response = await fetch('/api/applications/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert(
+                        `<strong>신청이 정상적으로 접수되었습니다!</strong><br>` +
+                        `신청 과정: ${result.program_title} / 연락 가능일: ${result.available_date}`,
+                        true
+                    );
+                    form.reset();
+                    document.getElementById('program').value = payload.program;
+                } else {
+                    const errorMessages = Object.values(result).flat().join('<br>');
+                    showAlert(`<strong>입력 내용을 확인해 주세요:</strong><br>${errorMessages}`, false);
+                }
+            } catch (error) {
+                showAlert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.', false);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '교육 신청 접수하기';
+            }
+        });
+
+        initPrograms();
+    </script>
+</body>
+</html>
