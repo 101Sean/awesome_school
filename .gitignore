@@ -1,0 +1,19 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+db.sqlite3
+media/
+
+# Environment & Secrets
+.env
+credentials.json
+*.json
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
