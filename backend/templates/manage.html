@@ -68,6 +68,14 @@
 
             <div class="flex items-center gap-2">
                 <span id="toast-msg" class="text-xs font-semibold text-emerald-600 hidden">저장되었습니다.</span>
+                <button onclick="triggerReminders()"
+                    class="px-3.5 py-1.5 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition">
+                    안내 메일 일괄 발송
+                </button>
+                <button onclick="exportToSheets()"
+                    class="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition">
+                    Google 시트 내보내기
+                </button>
                 <button onclick="loadApplications(currentStatus)"
                     class="px-3.5 py-1.5 rounded-lg border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50">
                     새로고침
@@ -186,6 +194,41 @@
             });
             if (res.ok) {
                 location.reload();
+            }
+        }
+
+        async function triggerReminders() {
+            const targetDate = prompt(
+                '안내 메일 발송 기준 날짜를 입력하세요 (YYYY-MM-DD).\n비워두고 확인을 누르면 오늘 날짜 기준으로 실행됩니다.',
+                new Date().toISOString().split('T')[0]
+            );
+            if (targetDate === null) return;
+
+            const res = await fetch('/api/applications/actions/send-reminders/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify({ date: targetDate.trim() }),
+            });
+            const data = await res.json();
+            alert(data.message);
+            loadApplications(currentStatus);
+        }
+
+        async function exportToSheets() {
+            const res = await fetch('/api/applications/actions/export-sheets/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            });
+            const data = await res.json();
+            alert(data.message);
+            if (data.spreadsheet_url) {
+                window.open(data.spreadsheet_url, '_blank');
             }
         }
 

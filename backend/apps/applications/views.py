@@ -4,6 +4,13 @@ from rest_framework import generics, permissions
 from .models import Application
 from .serializers import ApplicationSerializer, ApplicationAdminUpdateSerializer
 
+from io import StringIO
+from django.core.management import call_command
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .services import export_applications_to_google_sheet
+
 
 class ManageDashboardView(LoginRequiredMixin, TemplateView):
     """관리자 전용 신청 내역 대시보드 (GET /manage/)"""
@@ -45,3 +52,37 @@ class ApplicationDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ["PUT", "PATCH"]:
             return ApplicationAdminUpdateSerializer
         return ApplicationSerializer
+
+
+class TriggerReminderEmailView(APIView):
+    """관리자 대시보드에서 안내 메일 발송 배치를 수동 실행하는 API (POST)"""
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request):
+        target_date = request.data.get("date")
+        out = StringIO()
+        if target_date:
+            call_command("send_reminders", date=target_date, stdout=out)
+        else:
+            call_command("send_reminders", stdout=out)
+
+        output_text = out.getvalue().strip()
+        return Response(
+            {"message": output_text or "안내 메일 발송 배치를 실행했습니다."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class ExportGoogleSheetView(APIView):
+    """관리자 대시보드에서 Google Spreadsheet로 신청 내역을 내보내는 API (POST)"""
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request):
+        try:
+            result = export_applications_to_google_sheet()
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"message": f"스프레드시트 동기화 중 오류가 발생했습니다: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
