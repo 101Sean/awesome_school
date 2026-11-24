@@ -103,7 +103,7 @@ awesome_school/
 
 ## 6. 심사자용 로컬 실행 및 테스트 가이드
 
-### ① 저장소 클론 및 가상환경 설정
+### (1) 저장소 클론 및 가상환경 설정
 ```bash
 git clone [https://github.com/101Sean/awesome_school.git](https://github.com/101Sean/awesome_school.git)
 cd awesome_school
@@ -117,7 +117,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### ② 데이터베이스 실행 및 마이그레이션
+### (2) 데이터베이스 실행 및 마이그레이션
 *(Docker가 실행 중인 환경에서는 아래 명령어로 PostgreSQL 컨테이너를 먼저 띄웁니다.)*
 ```bash
 docker compose up -d db
@@ -130,7 +130,7 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-### ③ 개발 서버 실행 및 기능 확인
+### (3) 개발 서버 실행 및 기능 확인
 ```bash
 python manage.py runserver
 ```
@@ -140,7 +140,7 @@ python manage.py runserver
   - 생성한 슈퍼유저 계정으로 로그인 후 상태 필터링, 상태 변경(`접수`/`확인중`/`완료`), **안내 메일 일괄 발송**, **Google 시트 내보내기** 버튼 동작 확인
 - **Django Admin:** `http://127.0.0.1:8000/admin/`
 
-### ④ 자동 안내 메일 발송 CLI 및 단위 테스트 실행
+### (4) 자동 안내 메일 발송 CLI 및 단위 테스트 실행
 ```bash
 # 오늘 날짜 기준 안내 메일 발송 (터미널 콘솔에 발송 본문 출력)
 python manage.py send_reminders
